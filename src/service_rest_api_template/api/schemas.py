@@ -1,29 +1,29 @@
-from datetime import datetime
-
 from pydantic import BaseModel
+from typing import List, Optional
 
+class ItemBase(BaseModel):
+    title: str
+    description: Optional[str] = None
 
-class Message(BaseModel):
-    client_id: str
-    content: str
-    timestemp: datetime
+class ItemCreate(ItemBase):
+    pass
 
-class Client(BaseModel):
+class Item(ItemBase):
     id: int
-    name: str
+    owner_id: int
 
-class Endpoint1Request(BaseModel):
-    client_id: str
-    content: str
+    class Config:
+        orm_mode = True
 
-class Endpoint2Request(BaseModel):
-    client_id: str
-    content: str
+class UserBase(BaseModel):
+    username: str
 
-class Endpoint1Response(BaseModel):
-    message: str
-    timestamp: datetime
+class UserCreate(UserBase):
+    pass
 
-class Endpoint2Response(BaseModel):
-    message: str
-    timestamp: datetime
+class User(UserBase):
+    id: int
+    items: List[Item] = []
+
+    class Config:
+        orm_mode = True
