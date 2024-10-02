@@ -2,12 +2,13 @@ import logging.config
 import os
 
 from dotenv import find_dotenv, load_dotenv
-from omegaconf import OmegaConf
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
+
 from .models import Base
+
 
 # Load logging configuration with OmegaConf
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +22,7 @@ DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
+APP_NAME = os.getenv("APP_NAME")
 
 # Check if any of the required environment variables are not set
 if not all([DB_HOST, DB_NAME, DB_USER, DB_PASSWORD]):
@@ -31,9 +33,10 @@ if not all([DB_HOST, DB_NAME, DB_USER, DB_PASSWORD]):
 DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
 
 def get_enginge():
+    logger.info(f"Creating database engine for {DB_NAME}")
     return create_engine(
         DATABASE_URL,
-        connect_args={'connect_timeout': 5, "application_name": "llm_chatbot_api"},
+        connect_args={'connect_timeout': 5, "application_name": APP_NAME},
         poolclass=NullPool
     )
 

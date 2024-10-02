@@ -3,16 +3,10 @@ import logging
 import uvicorn
 from fastapi import FastAPI
 from omegaconf import OmegaConf
-from service_rest_api_template.api.endpoints import endpoint1, endpoint2
+from service_rest_api_template.api.routes import hello, items, users
 from service_rest_api_template.db.database import create_tables
 
-
-# Load logging configuration with OmegaConf
-logging_config = OmegaConf.to_container(
-    OmegaConf.load("./src/service_rest_api_template/conf/logging_config.yaml"),
-    resolve=True
-)
-logging.config.dictConfig(logging_config)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def create_app(config_path: str = "src/service_rest_api_template/conf/config.yaml") -> FastAPI:
@@ -26,12 +20,13 @@ def create_app(config_path: str = "src/service_rest_api_template/conf/config.yam
     """
     config = OmegaConf.load(config_path)
 
-    app = FastAPI(title=config.api.title, description=config.api.description, version=config.api.version)
+    api_router = FastAPI(title=config.api.title, description=config.api.description, version=config.api.version)
 
-    app.include_router(endpoint1.router)
-    app.include_router(endpoint2.router)
+    api_router.include_router(users.router, prefix="/users", tags=["users"])
+    api_router.include_router(items.router, prefix="/items", tags=["items"])
+    api_router.include_router(hello.router, prefix="/hello", tags=["hello"])
 
-    return app
+    return api_router
 
 
 if __name__ == "__main__":
